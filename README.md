@@ -1,46 +1,94 @@
-Instalación de la imagen
-Ronald Andrade
+Aquí tienes el contenido del `README.md` basado en la información que proporcionaste:
 
+```markdown
+# Examen Interciclo - Ronald Andrade
 
-Nos descargamos la imagen desde docker hub:
-docker pull ronaldandrap17/exameninterciclo_andraderonald
-Levantamos el contenedor con el siguiente comando:
-docker run -d -p ${PORT}:80 -v ${PATH}:/app/front --name ${CONTAINER_NAME} ronaldandrap17/exameninterciclo_andraderonald
-Donde:
+## Instalación de la imagen
 
-${PORT}: es el puerto en donde deseamos levantar nuestra aplicación. En caso de no colocarlo se levantará en el puerto 80.
-${PATH}: ruta donde tenemos nuestro frontend en Angular.
-${CONTAINER_NAME}: nombre de nuestro contenedor.
-Nota: en caso de realizar modificaciones en el frontend, es necesario reiniciar el contenedor. Para ello usamos el comando: docker restart ${CONTAINER_NAME}
-Dockerfile
+1. **Descarga la imagen desde Docker Hub:**
 
-Este proyecto utiliza la última imagen disponible de ubuntu en docker hub.
+   Ejecuta el siguiente comando para descargar la imagen del contenedor:
 
-Funcionamiento
+   ```bash
+   docker pull ronaldandrap17/exameninterciclo_andraderonald
+   ```
 
-Partimos de la imagen de ubuntu
+2. **Levanta el contenedor:**
+
+   Una vez descargada la imagen, ejecuta el siguiente comando para levantar el contenedor:
+
+   ```bash
+   docker run -d -p ${PORT}:80 -v ${PATH}:/app/front --name ${CONTAINER_NAME} ronaldandrap17/exameninterciclo_andraderonald
+   ```
+
+   **Explicación de los parámetros:**
+
+   - `${PORT}`: Es el puerto en el que deseas levantar la aplicación. Si no especificas un puerto, se levantará en el puerto `80` por defecto.
+   - `${PATH}`: La ruta donde se encuentra tu frontend en Angular.
+   - `${CONTAINER_NAME}`: El nombre que deseas asignar al contenedor.
+
+   **Nota:** Si realizas modificaciones en el frontend, es necesario reiniciar el contenedor. Puedes hacerlo con el siguiente comando:
+
+   ```bash
+   docker restart ${CONTAINER_NAME}
+   ```
+
+## Dockerfile
+
+Este proyecto utiliza la última imagen disponible de **Ubuntu** en Docker Hub.
+
+```dockerfile
+# Partimos de la imagen base de Ubuntu
 FROM ubuntu:latest
-Dentro de la imagen actualizamos los paquetes de ubuntu y realizamos la instalación de los paquetes curl y gnupg para poder realizar la instalación de NodeJS en los pasos siguientes.
+
+# Actualizamos los paquetes de Ubuntu e instalamos curl y gnupg
 RUN apt-get update
 RUN apt-get install -y curl gnupg
-Descargamos NodeJS en su versión 22.x y procedemos a instalarlo mediante bash
+
+# Instalamos NodeJS versión 22.x
 RUN curl -sL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get -y install nodejs
-Realizamos la instalación de nginx con el manejador de paquetes de ubuntu
+
+# Instalamos nginx
 RUN apt-get install -y nginx
-Instalamos el CLI de Angular mediante npm
+
+# Instalamos Angular CLI
 RUN npm install -g @angular/cli
-Cargamos la configuración de nginx para servir nuestra aplicación de Angular. Esta configuración la copiamos desde el repositorio y la colocamos en la carpeta de configuración de nginx. Además, eliminamos el sitio por defecto que se genera al instalar nginx.
+
+# Configuramos nginx para servir nuestra aplicación Angular
 COPY nginx.conf /etc/nginx/sites-available/default
 RUN rm -rf /var/www/html/*
-Creamos el volumen para nuestro front en la ruta /app/front y nos ubicamos en esa ruta.
+
+# Creamos un volumen para nuestro frontend
 VOLUME /ExamenInterciclo_AndradeRonald/appRonald
+
+# Establecemos el directorio de trabajo
 WORKDIR /ExamenInterciclo_AndradeRonald/appRonald
-Ejecutamos los comandos para instalar las dependencias de nuestro proyecto, compilar y copiar los archivos generados a la carpeta de nginx. Finalmente, levantamos nginx en modo silencioso y servimos nuestra aplicación.
+
+# Instalamos dependencias, compilamos la app y copiamos los archivos generados a nginx
 CMD ["bash", "-c", "npm install --force && ng build && cp -r /ExamenInterciclo_AndradeRonald/appRonald/dist/app-ronald/* /var/www/html && nginx -g 'daemon off;'"]
+
+# Exponemos el puerto 80
 EXPOSE 80
-Creación de imagen
+```
 
-Para construir nuestra imagen basándonos en el Dockerfile nos situamos en la raíz del repositorio y ejecutamos el siguiente comando:
+## Creación de la imagen Docker
 
-docker build -t ronaldandrap17/exameninterciclo_andradeRonald .
+Para construir la imagen a partir del `Dockerfile`, sigue estos pasos:
+
+1. Sitúate en la raíz del repositorio donde se encuentra el `Dockerfile`.
+2. Ejecuta el siguiente comando:
+
+   ```bash
+   docker build -t ronaldandrap17/exameninterciclo_andradeRonald .
+   ```
+
+Esto creará la imagen personalizada de tu aplicación, que podrás usar para levantar un contenedor.
+
+## Notas adicionales
+
+- Asegúrate de tener configurado correctamente tu archivo `nginx.conf` y las rutas de tu frontend.
+- Si necesitas realizar cambios en el frontend, recuerda reiniciar el contenedor con el comando `docker restart ${CONTAINER_NAME}`.
+```
+
+Este archivo `README.md` contiene la información estructurada de manera clara para la instalación, configuración y uso del contenedor. Puedes personalizar cualquier detalle según lo necesites.
